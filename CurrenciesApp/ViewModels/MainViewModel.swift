@@ -27,16 +27,19 @@ class MainViewModel {
     
     @objc func makeRequest() {
         mainState.value = .loading
-        NetworkManager.shared.getNewData { response in
-            switch response {
-            case .success(let newData):
-                var domainObjects: [CurrencyDomain] = []
+
+        var domainObjects: [CurrencyDomain] = []
+
+        Task {
+            do {
+                let newData = try await NetworkManager.shared.getNewData()
                 for item in newData.data {
                     domainObjects.append(CurrencyDomain(name: item.key, value: item.value))
                 }
                 self.mainState.value = .newData(domainObjects)
-            case .failure(let failure):
-                self.mainState.value = .error(failure)
+            }
+            catch {
+                self.mainState.value = .error(error)
             }
         }
     }
