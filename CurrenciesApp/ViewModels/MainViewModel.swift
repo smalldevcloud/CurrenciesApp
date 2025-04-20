@@ -30,7 +30,7 @@ class MainViewModel {
 
         var domainObjects: [CurrencyDomain] = []
 
-        Task {
+        Task { @MainActor in
             do {
                 let newData = try await NetworkManager.shared.getNewData()
                 for item in newData.data {
